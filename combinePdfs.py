@@ -5,28 +5,58 @@
 import PyPDF2
 import os
 import argparse
+import sys
 
-parser = argparse.ArgumentParser(prog="JuntaPDF's",
-                                 description="Junta PDF's em um único arquivo (combinado.pdf)")
-parser.add_argument(
-    '--caminho', help="Caminho da pasta onde estão os PDF's, se não for informado, utiliza a pasta atual", default=".")
-args = parser.parse_args()
+dragPath = ""
+parameterPath = "."
 
-if os.path.exists(args.caminho) == False:
+# parser = argparse.ArgumentParser(prog="JuntaPDF's",
+#                                 description="Junta PDF's em um único arquivo (combinado.pdf)")
+# parser.add_argument(
+#    '--caminho', help="Caminho da pasta onde estão os PDF's, se não for informado, utiliza a pasta atual", default=".")
+#args = parser.parse_known_args()
+
+#print("args", args)
+
+print(sys.argv)
+print('teste')
+
+x = 0
+
+for atributo in sys.argv[1:]:
+    x += 1
+    if atributo.startswith("caminho"):
+        parameterPath = atributo[8:]
+        print("caminho", x, parameterPath)
+    else:
+        if atributo.strip != "":
+            dragPath = atributo
+            print("caminho2", x, atributo)
+
+
+if dragPath != "":
+    parameterPath = dragPath
+
+if os.path.exists(parameterPath) == False:
+    print("caminho", parameterPath)
     input("O caminho informado não existe, por favor verifique.")
-    exit()
+    sys.exit()
 
+if len(dragPath) > 0:
+    if parameterPath == '.':
+        if os.path.exists(dragPath):
+            parameterPath = dragPath
 
 # Get all the PDF filenames.
 pdfFiles = []
-for filename in os.listdir(args.caminho):
+for filename in os.listdir(parameterPath):
     if filename.endswith('.pdf') and filename != 'combinado.pdf':
-        pdfFiles.append(args.caminho + '\\' + filename)
+        pdfFiles.append(parameterPath + '\\' + filename)
 pdfFiles.sort()
 
 if len(pdfFiles) == 0:
     input("O caminho informado não possui PDF's, por favor verifique.")
-    exit()
+    sys.exit()
 
 pdfWriter = PyPDF2.PdfFileWriter()
 
@@ -41,6 +71,6 @@ for filename in pdfFiles:
         pdfWriter.addPage(pageObj)
 
 # Save the resulting PDF to a file.
-pdfOutput = open(args.caminho + '\combinado.pdf', 'wb')
+pdfOutput = open(parameterPath + '\combinado.pdf', 'wb')
 pdfWriter.write(pdfOutput)
 pdfOutput.close()
